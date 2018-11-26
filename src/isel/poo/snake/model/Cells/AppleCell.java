@@ -1,6 +1,5 @@
 package isel.poo.snake.model.Cells;
 
-import isel.poo.snake.ctrl.Dir;
 import isel.poo.snake.model.Position;
 
 import java.util.LinkedList;
@@ -9,8 +8,6 @@ public class AppleCell extends Cell {
 
     public AppleCell() {
         super();
-        this.type = 'A';
-
     }
 
     public AppleCell(Cell[][] LevelMatrix){
@@ -39,18 +36,5 @@ public class AppleCell extends Cell {
         return  positions;
     }
 
-    @Override
-    public Dir getDirection() {
-        return null;
-    }
 
-    @Override
-    public void setDirection(Dir direction) {
-
-    }
-
-    @Override
-    public void doYourThing(Cell[][] LevelMatrix, int stepCount) {
-
-    }
 }

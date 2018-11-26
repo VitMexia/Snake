@@ -67,7 +67,7 @@ public class Loader {
     }
 
     private Cell createCell(char type) throws LevelFormatException {
-        Cell cell = Cell.getApple(type);     // Create a cell identified by first char
+        Cell cell = Cell.newInstance(type);     // Create a cell identified by first char
         if (cell==null)
             error("Unknown cell type ("+type+")");
         return cell;

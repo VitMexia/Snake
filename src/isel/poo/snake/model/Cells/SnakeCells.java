@@ -135,32 +135,32 @@ public class SnakeCells extends MovingCells {
 
         if(cell == null) return;
 
-        if(cell.type == 'A'){
+        if(cell instanceof AppleCell){
 
             removeCell(cell.getPosition());
             ateApple = true;
             bodyToAdd += 4;
             justAte = true;
         }
-        else if(cell.type == 'M'){
+        else if(cell instanceof MouseCell){
             removeCell(cell.getPosition());
             ateMouse = true;
-            cell.isDead = true;
+            ((MovingCells)cell).isDead = true;
             bodyToAdd += 10;
             justAte = true;
         }
-        else if(cell.type == 'D'){
+        else if(cell instanceof DeadCell){
             removeCell(cell.getPosition());
             ateSnake = true;
             bodyToAdd += 10 + 2* bodyList.size();
             justAte = true;
         }
-        else if(cell.type == 'W')
+        else if(cell instanceof WallCell)
         {
             killSnake();
             return;
         }
-        else if(cell.type == 'B'){
+        else if(cell instanceof BodyCell){
 
             boolean notMoved = false;
             for (SnakeCells snake: snakes) {

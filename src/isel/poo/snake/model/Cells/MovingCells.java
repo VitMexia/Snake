@@ -2,7 +2,6 @@ package isel.poo.snake.model.Cells;
 
 import isel.poo.snake.ctrl.Dir;
 import isel.poo.snake.model.Position;
-import java.util.LinkedList;
 import java.util.List;
 
 //Abstract Class that implements the methods and abstract methods that need to be implemented
@@ -11,12 +10,17 @@ public abstract class MovingCells extends Cell {
 
     private Dir direction;
 
-    @Override
+    public boolean isDead;
+    public boolean ateMouse;
+    public boolean ateSnake;
+    public boolean ateApple;
+    public int snakeSize;
+
     public void setDirection(Dir direction) {
         this.direction = direction;
     }
 
-    @Override
+
     public Dir getDirection() {
         return direction;
     }
@@ -49,9 +53,12 @@ public abstract class MovingCells extends Cell {
     protected void moveTo(Position oldPos, Position newPos){
         for (StateChangeListener listener: listeners)
             listener.positionChanged(this, oldPos, newPos);
-
-
     }
+
+
+
+    //abstract methods and interfaces
+    public abstract void doYourThing(Cell[][] LevelMatrix, int stepCount);
 
     //tells the listener subscribers (Level) that a cell has been removed
     protected void removeCell(Position pos){
@@ -61,5 +68,11 @@ public abstract class MovingCells extends Cell {
         }
     }
 
+    //tells the listener subscribers that a cell has been created
+    protected void createCell(Cell cell) {
+        for (StateChangeListener listener : listeners) {
+            listener.cellCreated(cell);
+        }
+    }
 
 }

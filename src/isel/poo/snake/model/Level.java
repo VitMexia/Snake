@@ -4,12 +4,12 @@ import isel.poo.snake.ctrl.Dir;
 import isel.poo.snake.model.Cells.*;
 import java.util.LinkedList;
 
-public class Level {
+public class Level{
 
     private int levelNumber, height, width, appleCount, startApples;
     public Cell[][] lMatrix;
-    private LinkedList<Cell> otherPlayers;
-    private Cell playerHead;
+    private LinkedList<MovingCells> otherPlayers;
+    private MovingCells playerHead;
     private int playerSize;
     private Game game;
     private boolean finish;
@@ -62,7 +62,7 @@ public class Level {
     public void step() {
 
         //goes through the list of mouses and Bad Snakes and each one does its thing
-        for (Cell others: otherPlayers) {
+        for (MovingCells others: otherPlayers) {
             if(!others.isDead) others.doYourThing(lMatrix, stepCount);
             else otherPlayers.remove(others);
 
@@ -93,7 +93,7 @@ public class Level {
     }
 
     //checks was was eaten by each snake (player or BadASnake) and adds score and requests a new apple when required
-    private void checkMeal(Cell cell) {
+    private void checkMeal(MovingCells cell) {
 
             if (cell.ateApple) {
                 if(!cell.isBad) {
@@ -120,7 +120,7 @@ public class Level {
     }
 
     //Requests Cell Class to generate an apple on a free position
-    private void AddApples(Cell cell) {
+    private void AddApples(MovingCells cell) {
 
         if(appleCount >= startApples || cell.isBad ){
             Cell apple = Cell.getApple(lMatrix) ;
@@ -146,24 +146,25 @@ public class Level {
     public void putCell(int l, int c, Cell cell) {
 
 
-        if(cell.type == 'S' && !cell.isBad){
-            playerHead = cell;
+        if(cell instanceof SnakeCells && !((MovingCells)cell).isBad){
+            playerHead = (MovingCells) cell;
         }
-        else if(cell.type == 'S' && cell.isBad){
+        else if(cell instanceof SnakeCells && ((MovingCells)cell).isBad){
 
-            otherPlayers.add(cell);
+            otherPlayers.add((MovingCells) cell);
         }
-        else if(cell.type == 'A'){
+        else if(cell instanceof AppleCell){
             startApples +=1;
         }
-        else if(cell.type == 'M'){
-            otherPlayers.add(0, cell);
+        else if(cell instanceof MouseCell){
+            otherPlayers.add(0, (MovingCells) cell);
         }
 
         cell.setPosition(l,c);
 
         lMatrix[l][c] = cell;
     }
+
 
     public interface Observer {
         public void cellUpdated(int l, int c, Cell cell); //its never used in this implementation
@@ -189,7 +190,6 @@ public class Level {
                 updater.cellMoved(oldPos.getLine(), oldPos.getCol(),newPos.getLine(), newPos.getCol(), source );
                 lMatrix[oldPos.getLine()][oldPos.getCol()] = null;
                 lMatrix[newPos.getLine()][newPos.getCol()] = source;
-
             }
 
             @Override
@@ -211,6 +211,14 @@ public class Level {
          for (Cell cell : otherPlayers) {
              cell.addListener(listener);
         }
+
+
     }
+//
+//    @Override
+//    public Cell[][] getLevelMatrix() {
+//        return lMatrix;
+//    }
+
 
 }

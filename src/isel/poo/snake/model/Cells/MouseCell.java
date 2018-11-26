@@ -7,7 +7,7 @@ import java.util.List;
 public class MouseCell extends MovingCells {
 
     public MouseCell(){ super();
-    this.type = 'M';
+
     }
 
     @Override
