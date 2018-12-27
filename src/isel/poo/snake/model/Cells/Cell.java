@@ -11,13 +11,10 @@ public abstract class Cell {
 
 
     private Position position;
-    public char type; // used to simplify the need to understand cell types S- SnakeCell, B-BodyCell, W-WallCell, A-AppleCell, D-DeadCell, M-MouseCell
     private final Random random = new Random();
     public boolean isBad;
     protected List<StateChangeListener> listeners;
     protected TheMatrix theMatrix;
-
-    //public Cell[][] LevelMatrix;
 
     public Cell()
     {
@@ -36,7 +33,6 @@ public abstract class Cell {
         }
         return null;
     }
-
 
     //Sets the Cell position by receiving a position
     public void setPosition(Position position){
@@ -67,13 +63,9 @@ public abstract class Cell {
         }
     }
 
-    //creates a new Apple on an empty position
-    //public static Cell getApple(Cell[][] LevelMatrix) {
-//        return new AppleCell(LevelMatrix);
-//    }
 
-    public static Cell getApple(TheMatrix theMatrix) {
-        return new AppleCell(theMatrix);
+    public static Cell getApple() {
+        return new AppleCell();
     }
 
     //Adds a listener to the array

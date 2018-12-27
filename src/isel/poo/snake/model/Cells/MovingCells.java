@@ -22,6 +22,10 @@ public abstract class MovingCells extends Cell {
         super(theMatrix);
     }
 
+    public MovingCells() {
+
+    }
+
     public void setDirection(Dir direction) {
         this.direction = direction;
     }
@@ -62,9 +66,8 @@ public abstract class MovingCells extends Cell {
     }
 
 
-
     //abstract methods and interfaces
-    public abstract void doYourThing(Cell[][] LevelMatrix, int stepCount);
+    public abstract void doYourThing(int stepCount);
 
     //tells the listener subscribers (Level) that a cell has been removed
     protected void removeCell(Position pos){

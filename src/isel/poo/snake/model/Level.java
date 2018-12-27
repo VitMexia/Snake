@@ -4,10 +4,12 @@ import isel.poo.snake.ctrl.Dir;
 import isel.poo.snake.model.Cells.*;
 import java.util.LinkedList;
 
-public class Level implements TheMatrix{
+public class Level{
 
-    private int levelNumber, height, width, appleCount, startApples;
-    public Cell[][] lMatrix;
+    private int levelNumber, appleCount, startApples;
+
+    public MapHolder mapHolder;
+
     private LinkedList<MovingCells> otherPlayers;
     private MovingCells playerHead;
     private int playerSize;
@@ -19,20 +21,17 @@ public class Level implements TheMatrix{
     public Level(int levelNumber, int height, int width) {
 
         this.levelNumber = levelNumber;
-        this.height = height;
-        this.width = width;
-        this.lMatrix = new Cell[height][width];
+        this.mapHolder = new MapHolder(new Cell[height][width]);
         this.appleCount = 10;//TODO: Correct to 10
-
-        otherPlayers = new LinkedList<>();
+        this.otherPlayers = new LinkedList<>();
     }
 
     public int getHeight() {
-        return height;
+        return mapHolder.getHeight();
     }
 
     public int getWidth() {
-        return width;
+        return mapHolder.getWidth();
     }
 
     public int getNumber() {
@@ -44,7 +43,7 @@ public class Level implements TheMatrix{
     }
 
     public Cell getCell(int l, int c) {
-        return  lMatrix[l][c];
+        return  mapHolder.getCellAt(l,c);
     }
 
     public void setObserver(Observer updater) {
@@ -63,7 +62,7 @@ public class Level implements TheMatrix{
 
         //goes through the list of mouses and Bad Snakes and each one does its thing
         for (MovingCells others: otherPlayers) {
-            if(!others.isDead) others.doYourThing(lMatrix, stepCount);
+            if(!others.isDead) others.doYourThing(stepCount);
             else otherPlayers.remove(others);
 
             if(others.ateApple) {
@@ -72,7 +71,7 @@ public class Level implements TheMatrix{
         }
 
         playerSize = playerHead.snakeSize;
-        playerHead.doYourThing(lMatrix, stepCount);
+        playerHead.doYourThing(stepCount);
         checkMeal(playerHead); // checks what the player ate and acts accordingly
 
         if(appleCount == 0 ){
@@ -123,10 +122,9 @@ public class Level implements TheMatrix{
     private void AddApples(MovingCells cell) {
 
         if(appleCount >= startApples || cell.isBad ){
-            Cell apple = Cell.getApple(this) ;
+            Cell apple = Cell.getApple() ;
             updater.cellCreated(apple.getPosition().getLine(), apple.getPosition().getCol(), apple);
-            lMatrix[apple.getPosition().getLine()][apple.getPosition().getCol()] = apple;
-
+            mapHolder.setCellAt(apple, apple.getPosition());
         }
     }
 
@@ -161,8 +159,8 @@ public class Level implements TheMatrix{
         }
 
         cell.setPosition(l,c);
+        mapHolder.setCellAt(cell, cell.getPosition());
 
-        lMatrix[l][c] = cell;
     }
 
 
@@ -188,20 +186,20 @@ public class Level implements TheMatrix{
             @Override
             public void positionChanged(Cell source, Position oldPos, Position newPos) {
                 updater.cellMoved(oldPos.getLine(), oldPos.getCol(),newPos.getLine(), newPos.getCol(), source );
-                lMatrix[oldPos.getLine()][oldPos.getCol()] = null;
-                lMatrix[newPos.getLine()][newPos.getCol()] = source;
+                mapHolder.clearCellAt(oldPos);
+                mapHolder.setCellAt(source, newPos);
             }
 
             @Override
             public void cellRemoved(Position posToRemove) {
                 updater.cellRemoved(posToRemove.getLine(), posToRemove.getCol());
-                lMatrix[posToRemove.getLine()][posToRemove.getCol()] = null;
+                mapHolder.clearCellAt(posToRemove);
             }
 
             @Override
             public void cellCreated(Cell cell) {
                 updater.cellCreated(cell.getPosition().getLine(), cell.getPosition().getCol(), cell); //add where head wa
-                lMatrix[cell.getPosition().getLine()][cell.getPosition().getCol()] = cell;
+                mapHolder.setCellAt(cell, cell.getPosition());
             }
 
 
@@ -215,43 +213,5 @@ public class Level implements TheMatrix{
 
     }
 
-    @Override
-    public Cell[][] getLevelMatrix() {
-        return lMatrix;
-    }
 
-    @Override
-    public Cell getCellAt(int line, int col) {
-        return lMatrix[line][col];
-    }
-
-    @Override
-    public Cell getCellAt(Position position) {
-
-        Position correctPos = position;
-        //Correct Lines
-        if(position.getLine() == -1){
-            correctPos.setLine(getHeight()-1);
-        }else if(position.getLine() == getHeight()){
-            correctPos.setLine(0);
-        }
-        //Correct Columns
-        if(position.getCol() == -1){
-            correctPos.setLine(getWidth()-1);
-        }else if(position.getCol() == getWidth()){
-            correctPos.setCol(0);
-        }
-
-        return lMatrix[position.getLine()][position.getCol()];
-    }
-
-    @Override
-    public int getLineLimit() {
-        return getHeight();
-    }
-
-    @Override
-    public int getColLimit() {
-        return getWidth();
-    }
 }

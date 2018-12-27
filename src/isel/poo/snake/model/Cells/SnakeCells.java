@@ -2,6 +2,8 @@ package isel.poo.snake.model.Cells;
 
 import isel.poo.snake.ctrl.Dir;
 import isel.poo.snake.model.Position;
+import isel.poo.snake.model.TheMatrix;
+
 import java.util.LinkedList;
 import java.util.List;
 
@@ -17,7 +19,6 @@ public class SnakeCells extends MovingCells {
 
     public SnakeCells() {
         super();
-        this.type = 'S';
         bodyToAdd = 4;
         snakeSize = 1;
         bodyList = new LinkedList<>();
@@ -33,8 +34,7 @@ public class SnakeCells extends MovingCells {
 
     //sets the new positions for the player and other snakes
     @Override
-    public void doYourThing(Cell[][] LevelMatrix, int stepCount) {
-        this.LevelMatrix = LevelMatrix;
+    public void doYourThing(int stepCount) {
 
         Position oldPos = getPosition();
         Position newPos = getNewPos();
@@ -89,39 +89,16 @@ public class SnakeCells extends MovingCells {
 
             List<Position> adjacentAvailCell = new LinkedList<>();
 
-            //Correct Positions if at the limit of the "Arena"
+            for (Dir d: Dir.values()) {
 
-            Position posUP = correctPosition(new Position(position.getLine() - 1, position.getCol()));
-            Position posDown = correctPosition(new Position(position.getLine() + 1, position.getCol()));
-            Position posLeft = correctPosition(new Position(position.getLine(), position.getCol() - 1));
-            Position posRight = correctPosition(new Position(position.getLine(), position.getCol() + 1));
+                Position pos = new Position(position.getLine() + d.line, position.getCol() + d.column);
 
-            //Get freePosition or Eatables positions
-            if(LevelMatrix[posUP.getLine()][posUP.getCol()] == null ||
-                    LevelMatrix[posUP.getLine()][posUP.getCol()].type == 'A'
-                    || LevelMatrix[posUP.getLine()][posUP.getCol()].type == 'M')
-            {
-                adjacentAvailCell.add(posUP);
+                if(theMatrix.getCellAt(pos) == null || theMatrix.getCellAt(pos) instanceof AppleCell
+                    || theMatrix.getCellAt(pos) instanceof MouseCell)
+                {
+                    adjacentAvailCell.add(new Position(position.getLine() + d.line, position.getCol() + d.column));
+                }
             }
-            if(LevelMatrix[posDown.getLine()][posDown.getCol()] == null ||
-                    LevelMatrix[posDown.getLine()][posDown.getCol()].type == 'A'
-                    || LevelMatrix[posDown.getLine()][posDown.getCol()].type == 'M')
-            {
-                adjacentAvailCell.add(posDown);
-            }
-            if(LevelMatrix[posLeft.getLine()][posLeft.getCol()] == null ||
-                    LevelMatrix[posLeft.getLine()][posLeft.getCol()].type == 'A'
-                    || LevelMatrix[posLeft.getLine()][posLeft.getCol()].type == 'M')
-            {
-                adjacentAvailCell.add(posLeft);
-            }
-            if(LevelMatrix[posRight.getLine()][posRight.getCol()] == null ||
-                    LevelMatrix[posRight.getLine()][posRight.getCol()].type == 'A'
-                    ||LevelMatrix[posRight.getLine()][posRight.getCol()].type == 'M')
-            {
-                adjacentAvailCell.add(posRight);
-            }
-
             return adjacentAvailCell;
         }
     }
@@ -129,9 +106,7 @@ public class SnakeCells extends MovingCells {
     //depending on what type of cell is on the new position addbody, kill snake
     private void validateNewPos(Position pos){
 
-        Position correctedPos = correctPosition(pos);
-
-        Cell cell = LevelMatrix[correctedPos.getLine()][correctedPos.getCol()];
+        Cell cell = theMatrix.getCellAt(pos);
 
         if(cell == null) return;
 
@@ -208,28 +183,7 @@ public class SnakeCells extends MovingCells {
         if(isBad && getPosition() != null && getDirection() == null)
             setDirection(provideInitialDirection());
 
-
-        int newCol = getPosition().getCol();
-        int newLine = getPosition().getLine();
-
-        switch (getDirection()) {
-
-            case LEFT:
-                newCol  = newCol -1 >-1 ? newCol-1 : getColLimit()-1;
-                break;
-            case RIGHT:
-                newCol = newCol +1 < getColLimit() ? newCol+1 : 0;
-                break;
-            case UP:
-                newLine = newLine -1 >-1 ? newLine-1 : getLineLimit()-1;
-
-                break;
-            case DOWN:
-                newLine = newLine +1 < getColLimit() ? newLine+1 : 0;
-                break;
-        }
-
-        return new Position(newLine, newCol);
+        return new Position(getPosition().getLine() + getDirection().line, getPosition().getCol()+getDirection().column);
     }
 
     //Provides a radom  generated direction when the game starts to each one of the bad snakes
