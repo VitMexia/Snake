@@ -1,6 +1,8 @@
 package isel.poo.snake.model.Cells;
 
+import isel.poo.snake.model.Level;
 import isel.poo.snake.model.Position;
+import isel.poo.snake.model.TheMatrix;
 
 import java.util.LinkedList;
 
@@ -10,11 +12,11 @@ public class AppleCell extends Cell {
         super();
     }
 
-    public AppleCell(Cell[][] LevelMatrix){
-        this();
-        this.LevelMatrix = LevelMatrix;
+
+    public AppleCell(TheMatrix theMatrix){
+        super(theMatrix);
         setPosition(getNewPosition());
-     }
+    }
 
 
     private Position getNewPosition() {
@@ -26,9 +28,9 @@ public class AppleCell extends Cell {
 
         LinkedList<Position> positions = new LinkedList<>();
 
-        for(int col = 0; col< getColLimit(); col++){
-            for(int line = 0; line< getLineLimit(); line++){
-                if(LevelMatrix[line][col] == null){
+        for(int col = 0; col< theMatrix.getColLimit(); col++){
+            for(int line = 0; line< theMatrix.getLineLimit(); line++){
+                if(theMatrix.getCellAt(line, col) == null){
                     positions.add(new Position(line, col));
                 }
             }

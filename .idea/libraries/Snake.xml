@@ -1,0 +1,12 @@
+<component name="libraryTable">
+  <library name="Snake">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/Snake.jar!/" />
+      <root url="jar://$PROJECT_DIR$/ConsolePG.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$PROJECT_DIR$/ConsolePG.jar!/docs" />
+    </JAVADOC>
+    <SOURCES />
+  </library>
+</component>

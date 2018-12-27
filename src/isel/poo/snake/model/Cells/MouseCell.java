@@ -1,27 +1,29 @@
 package isel.poo.snake.model.Cells;
 
 import isel.poo.snake.model.Position;
+import isel.poo.snake.model.TheMatrix;
+
 import java.util.LinkedList;
 import java.util.List;
 
 public class MouseCell extends MovingCells {
 
-    public MouseCell(){ super();
-
-    }
+    public MouseCell(TheMatrix theMatrix){
+        super(theMatrix);
+        }
 
     @Override
     public List<Position> getNewAdjacentAvailablePosition(Position position) {
 
         List<Position> adjacentAvailCell = new LinkedList<>();
 
-        Position posUP = correctPosition(new Position(position.getLine() - 1, position.getCol()));
-        Position posDown = correctPosition(new Position(position.getLine() + 1, position.getCol()));
-        Position posLeft = correctPosition(new Position(position.getLine(), position.getCol() - 1));
-        Position posRight = correctPosition(new Position(position.getLine(), position.getCol() + 1));
+//        Position posUP = correctPosition(new Position(position.getLine() - 1, position.getCol()));
+//        Position posDown = correctPosition(new Position(position.getLine() + 1, position.getCol()));
+//        Position posLeft = correctPosition(new Position(position.getLine(), position.getCol() - 1));
+//        Position posRight = correctPosition(new Position(position.getLine(), position.getCol() + 1));
 
         //Get freePosition positions
-        if(LevelMatrix[posUP.getLine()][posUP.getCol()] == null)
+        if(theMatrix.getCellAt(position.getLine() - 1 , position.getCol()) == null)
         {
             adjacentAvailCell.add(posUP);
         }

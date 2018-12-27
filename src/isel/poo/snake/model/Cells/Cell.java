@@ -1,6 +1,7 @@
 package isel.poo.snake.model.Cells;
 
 import isel.poo.snake.model.Position;
+import isel.poo.snake.model.TheMatrix;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,11 +15,18 @@ public abstract class Cell {
     private final Random random = new Random();
     public boolean isBad;
     protected List<StateChangeListener> listeners;
-    public Cell[][] LevelMatrix;
+    protected TheMatrix theMatrix;
+
+    //public Cell[][] LevelMatrix;
 
     public Cell()
     {
         listeners = new ArrayList<>();
+    }
+
+    public Cell(TheMatrix theMatrix){
+        super();
+        this.theMatrix = theMatrix;
     }
 
     //Produce a random position of a provided list of positions
@@ -29,15 +37,6 @@ public abstract class Cell {
         return null;
     }
 
-    //returns the number of lines +1 of the Level Matrix
-    public int getLineLimit(){
-        return LevelMatrix.length;
-    }
-
-    //return the number of columns +1 of the Level Matrix
-    public int getColLimit(){
-        return LevelMatrix[0].length;
-    }
 
     //Sets the Cell position by receiving a position
     public void setPosition(Position position){
@@ -69,8 +68,12 @@ public abstract class Cell {
     }
 
     //creates a new Apple on an empty position
-    public static Cell getApple(Cell[][] LevelMatrix) {
-        return new AppleCell(LevelMatrix);
+    //public static Cell getApple(Cell[][] LevelMatrix) {
+//        return new AppleCell(LevelMatrix);
+//    }
+
+    public static Cell getApple(TheMatrix theMatrix) {
+        return new AppleCell(theMatrix);
     }
 
     //Adds a listener to the array

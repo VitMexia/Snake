@@ -2,6 +2,8 @@ package isel.poo.snake.model.Cells;
 
 import isel.poo.snake.ctrl.Dir;
 import isel.poo.snake.model.Position;
+import isel.poo.snake.model.TheMatrix;
+
 import java.util.List;
 
 //Abstract Class that implements the methods and abstract methods that need to be implemented
@@ -15,6 +17,10 @@ public abstract class MovingCells extends Cell {
     public boolean ateSnake;
     public boolean ateApple;
     public int snakeSize;
+
+    public MovingCells(TheMatrix theMatrix) {
+        super(theMatrix);
+    }
 
     public void setDirection(Dir direction) {
         this.direction = direction;
@@ -33,14 +39,14 @@ public abstract class MovingCells extends Cell {
 
         //Correct Lines
         if(position.getLine() == -1){
-            correctPos.setLine(getLineLimit()-1);
-        }else if(position.getLine() == getLineLimit()){
+            correctPos.setLine(theMatrix.getLineLimit()-1);
+        }else if(position.getLine() == theMatrix.getLineLimit()){
             correctPos.setLine(0);
         }
         //Correct Columns
         if(position.getCol() == -1){
-            correctPos.setLine(getColLimit()-1);
-        }else if(position.getCol() == getColLimit()){
+            correctPos.setLine(theMatrix.getColLimit()-1);
+        }else if(position.getCol() == theMatrix.getColLimit()){
             correctPos.setCol(0);
         }
         return correctPos;

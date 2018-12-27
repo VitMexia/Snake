@@ -4,7 +4,7 @@ import isel.poo.snake.ctrl.Dir;
 import isel.poo.snake.model.Cells.*;
 import java.util.LinkedList;
 
-public class Level{
+public class Level implements TheMatrix{
 
     private int levelNumber, height, width, appleCount, startApples;
     public Cell[][] lMatrix;
@@ -123,7 +123,7 @@ public class Level{
     private void AddApples(MovingCells cell) {
 
         if(appleCount >= startApples || cell.isBad ){
-            Cell apple = Cell.getApple(lMatrix) ;
+            Cell apple = Cell.getApple(this) ;
             updater.cellCreated(apple.getPosition().getLine(), apple.getPosition().getCol(), apple);
             lMatrix[apple.getPosition().getLine()][apple.getPosition().getCol()] = apple;
 
@@ -214,11 +214,44 @@ public class Level{
 
 
     }
-//
-//    @Override
-//    public Cell[][] getLevelMatrix() {
-//        return lMatrix;
-//    }
 
+    @Override
+    public Cell[][] getLevelMatrix() {
+        return lMatrix;
+    }
 
+    @Override
+    public Cell getCellAt(int line, int col) {
+        return lMatrix[line][col];
+    }
+
+    @Override
+    public Cell getCellAt(Position position) {
+
+        Position correctPos = position;
+        //Correct Lines
+        if(position.getLine() == -1){
+            correctPos.setLine(getHeight()-1);
+        }else if(position.getLine() == getHeight()){
+            correctPos.setLine(0);
+        }
+        //Correct Columns
+        if(position.getCol() == -1){
+            correctPos.setLine(getWidth()-1);
+        }else if(position.getCol() == getWidth()){
+            correctPos.setCol(0);
+        }
+
+        return lMatrix[position.getLine()][position.getCol()];
+    }
+
+    @Override
+    public int getLineLimit() {
+        return getHeight();
+    }
+
+    @Override
+    public int getColLimit() {
+        return getWidth();
+    }
 }
