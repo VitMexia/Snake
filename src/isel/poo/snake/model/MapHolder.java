@@ -1,14 +1,20 @@
 package isel.poo.snake.model;
 
+import isel.poo.snake.ctrl.Dir;
+import isel.poo.snake.model.Cells.AppleCell;
 import isel.poo.snake.model.Cells.Cell;
+import isel.poo.snake.model.Cells.MouseCell;
 
-import java.util.concurrent.CancellationException;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Random;
 
 public class MapHolder {
 
-    private Cell[][] cellMap;
-    private int height;
-    private int width;
+    private final Cell[][] cellMap;
+    private final int height;
+    private final int width;
+    private final Random random = new Random();
 
     public MapHolder(Cell cell[][]){
 
@@ -38,7 +44,6 @@ public class MapHolder {
         cellMap[pos.getLine()][pos.getCol()] = null;
     }
 
-
     public Cell getCellAt(Position position) {
 
         Position correctPos = position;
@@ -56,6 +61,47 @@ public class MapHolder {
         }
 
         return cellMap[position.getLine()][position.getCol()];
+    }
+
+    public LinkedList<Position> getEmptyPositions() {
+
+        LinkedList<Position> positions = new LinkedList<>();
+
+        for(int col = 0; col< width; col++){
+            for(int line = 0; line< height; line++){
+                if(cellMap[line][col] == null){
+                    positions.add(new Position(line, col));
+                }
+            }
+        }
+        return  positions;
+    }
+
+    public List<Position> getNewAdjacentAvailablePosition(Position position, boolean eatables ) {
+
+        List<Position> adjacentAvailCell = new LinkedList<>();
+
+        for (Dir d: Dir.values()) {
+
+            Position pos = new Position(position.getLine() + d.line, position.getCol() + d.column);
+
+            if(getCellAt(pos) == null || eatables && (getCellAt(pos) instanceof AppleCell
+                        || getCellAt(pos) instanceof MouseCell))
+            {
+                adjacentAvailCell.add(pos);
+            }
+        }
+
+        return adjacentAvailCell;
+    }
+
+    //Produce a random position of a provided list of positions
+    public Position getRandomAvailablePosition(List<Position> list){
+
+        if(list.size() >0) {
+            return list.remove(random.nextInt(list.size()));
+        }
+        return null;
     }
 
 }

@@ -1,8 +1,8 @@
 package isel.poo.snake.model.Cells;
 
 import isel.poo.snake.ctrl.Dir;
+import isel.poo.snake.model.MapHolder;
 import isel.poo.snake.model.Position;
-import isel.poo.snake.model.TheMatrix;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -12,9 +12,12 @@ public class SnakeCells extends MovingCells {
 
     protected int bodyToAdd;
     private boolean justAte;
+    public boolean isBad;
+    public Cell meal;
+    public int snakeSize;
+
     protected LinkedList<BodyCell> bodyList;
-    //Static method to save each snake that can be accessed
-    protected static LinkedList<SnakeCells> snakes = new LinkedList();
+    protected static LinkedList<SnakeCells> snakes = new LinkedList();     //Static method to save each snake that can be accessed
 
 
     public SnakeCells() {
@@ -34,7 +37,9 @@ public class SnakeCells extends MovingCells {
 
     //sets the new positions for the player and other snakes
     @Override
-    public void doYourThing(int stepCount) {
+    public void doYourThing(int stepCount, MapHolder mapHolder) {
+
+        this.mapHolder = mapHolder;
 
         Position oldPos = getPosition();
         Position newPos = getNewPos();
@@ -48,8 +53,13 @@ public class SnakeCells extends MovingCells {
                 return;
             }
         }
+        else if(isDead){
+
+            if(bodyList.size()>0) removeCell(bodyList.removeLast().getPosition());
+            return;
+        }
         else{
-            List<Position> availablePos = getNewAdjacentAvailablePosition(getPosition());
+            List<Position> availablePos = mapHolder.getNewAdjacentAvailablePosition(getPosition(), true);
 
             boolean isFreePos = false;
 
@@ -60,7 +70,7 @@ public class SnakeCells extends MovingCells {
                 }
             }
             if (!isFreePos) {
-                newPos = getRandomAvailablePosition(availablePos);
+                newPos = mapHolder.getRandomAvailablePosition(availablePos);
 
                 if (newPos != null) {
                     setDirection(getDirection(newPos));
@@ -82,52 +92,32 @@ public class SnakeCells extends MovingCells {
 
     }
 
-    //get all position that are either null or Apples or Mouses
-    @Override
-    public List<Position> getNewAdjacentAvailablePosition(Position position) {
-        {
-
-            List<Position> adjacentAvailCell = new LinkedList<>();
-
-            for (Dir d: Dir.values()) {
-
-                Position pos = new Position(position.getLine() + d.line, position.getCol() + d.column);
-
-                if(theMatrix.getCellAt(pos) == null || theMatrix.getCellAt(pos) instanceof AppleCell
-                    || theMatrix.getCellAt(pos) instanceof MouseCell)
-                {
-                    adjacentAvailCell.add(new Position(position.getLine() + d.line, position.getCol() + d.column));
-                }
-            }
-            return adjacentAvailCell;
-        }
-    }
 
     //depending on what type of cell is on the new position addbody, kill snake
     private void validateNewPos(Position pos){
 
-        Cell cell = theMatrix.getCellAt(pos);
-
+        Cell cell = mapHolder.getCellAt(pos);
+        meal = null;
         if(cell == null) return;
 
         if(cell instanceof AppleCell){
 
             removeCell(cell.getPosition());
-            ateApple = true;
+            meal = cell;
             bodyToAdd += 4;
             justAte = true;
         }
         else if(cell instanceof MouseCell){
             removeCell(cell.getPosition());
-            ateMouse = true;
+            meal = cell;
             ((MovingCells)cell).isDead = true;
             bodyToAdd += 10;
             justAte = true;
         }
         else if(cell instanceof DeadCell){
             removeCell(cell.getPosition());
-            ateSnake = true;
-            bodyToAdd += 10 + 2* bodyList.size();
+            bodyToAdd += 10 + 2* ((DeadCell)cell).bodyList.size();
+            meal = cell;
             justAte = true;
         }
         else if(cell instanceof WallCell)
@@ -186,9 +176,9 @@ public class SnakeCells extends MovingCells {
         return new Position(getPosition().getLine() + getDirection().line, getPosition().getCol()+getDirection().column);
     }
 
-    //Provides a radom  generated direction when the game starts to each one of the bad snakes
+    //Provides a random  generated direction when the game starts to each one of the bad snakes
     private Dir provideInitialDirection() {
-        Position pos = getRandomAvailablePosition(getNewAdjacentAvailablePosition(getPosition()));
+        Position pos = mapHolder.getRandomAvailablePosition(mapHolder.getNewAdjacentAvailablePosition(getPosition(), true));
 
         if(getDirection() == null && pos != null){
             return getDirection(pos);
@@ -220,19 +210,11 @@ public class SnakeCells extends MovingCells {
         isDead = true;
         DeadCell dc = new DeadCell();
         dc.isBad = this.isBad;
+        dc.bodyList = this.bodyList;
         dc.setPosition(this.getPosition());
 
-        if (isBad) {
-            for (Cell bc : bodyList) {
-                removeCell(bc.getPosition());
-            }
-            bodyList = null;
-        }
         removeCell(this.getPosition());
         createCell(dc);
-        snakes.remove(this);
-
-
     }
 
 

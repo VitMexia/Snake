@@ -1,38 +1,25 @@
 package isel.poo.snake.model.Cells;
 
+import isel.poo.snake.model.MapHolder;
 import isel.poo.snake.model.Position;
-import isel.poo.snake.model.TheMatrix;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+
 
 public abstract class Cell {
 
 
     private Position position;
-    private final Random random = new Random();
-    public boolean isBad;
     protected List<StateChangeListener> listeners;
-    protected TheMatrix theMatrix;
+    protected MapHolder mapHolder;
 
     public Cell()
     {
         listeners = new ArrayList<>();
     }
 
-    public Cell(TheMatrix theMatrix){
-        super();
-        this.theMatrix = theMatrix;
-    }
 
-    //Produce a random position of a provided list of positions
-    protected Position getRandomAvailablePosition(List<Position> list){
-        if(list.size() >0) {
-            return list.remove(random.nextInt(list.size()));
-        }
-        return null;
-    }
 
     //Sets the Cell position by receiving a position
     public void setPosition(Position position){
@@ -63,9 +50,9 @@ public abstract class Cell {
         }
     }
 
-
-    public static Cell getApple() {
-        return new AppleCell();
+    //get an apple
+    public static Cell getApple(MapHolder mapHolder) {
+        return new AppleCell(mapHolder);
     }
 
     //Adds a listener to the array

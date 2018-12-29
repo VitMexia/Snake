@@ -2,6 +2,8 @@ package isel.poo.snake.model;
 
 import isel.poo.snake.ctrl.Dir;
 import isel.poo.snake.model.Cells.*;
+
+import java.util.Iterator;
 import java.util.LinkedList;
 
 public class Level{
@@ -11,7 +13,8 @@ public class Level{
     public MapHolder mapHolder;
 
     private LinkedList<MovingCells> otherPlayers;
-    private MovingCells playerHead;
+    private LinkedList<MovingCells> deadSnakes;
+    private SnakeCells playerHead;
     private int playerSize;
     private Game game;
     private boolean finish;
@@ -24,6 +27,7 @@ public class Level{
         this.mapHolder = new MapHolder(new Cell[height][width]);
         this.appleCount = 10;//TODO: Correct to 10
         this.otherPlayers = new LinkedList<>();
+        this.deadSnakes = new LinkedList<>();
     }
 
     public int getHeight() {
@@ -61,18 +65,27 @@ public class Level{
     public void step() {
 
         //goes through the list of mouses and Bad Snakes and each one does its thing
-        for (MovingCells others: otherPlayers) {
-            if(!others.isDead) others.doYourThing(stepCount);
-            else otherPlayers.remove(others);
+        for (MovingCells others: otherPlayers)
+        {
+            if (others.isDead && others instanceof  MouseCell)
+                otherPlayers.remove(others);
+            else
+                others.doYourThing(stepCount, mapHolder);
 
-            if(others.ateApple) {
-                checkMeal(others); //if snake ate apple, a new apple will be generated
+            if(others instanceof  SnakeCells) {
+                if (((SnakeCells) others).meal instanceof  AppleCell) {
+                    checkMeal(others, mapHolder); //if snake ate apple, a new apple will be generated
+                }
             }
         }
 
+        for (MovingCells deadSnake: deadSnakes) {
+            deadSnake.doYourThing(stepCount, mapHolder);
+        }
+
         playerSize = playerHead.snakeSize;
-        playerHead.doYourThing(stepCount);
-        checkMeal(playerHead); // checks what the player ate and acts accordingly
+        playerHead.doYourThing(stepCount, mapHolder);
+        checkMeal(playerHead, mapHolder); // checks what the player ate and acts accordingly
 
         if(appleCount == 0 ){
             finish = true;
@@ -92,28 +105,28 @@ public class Level{
     }
 
     //checks was was eaten by each snake (player or BadASnake) and adds score and requests a new apple when required
-    private void checkMeal(MovingCells cell) {
+    private void checkMeal(MovingCells cell, MapHolder mapHolder) {
 
-            if (cell.ateApple) {
-                if(!cell.isBad) {
+        this.mapHolder = mapHolder;
+
+            if (((SnakeCells)cell).meal instanceof AppleCell) {
+                if(!((SnakeCells)cell).isBad) {
                     appleCount -= 1;
                     game.addScore(4);
                     updater.applesUpdated(appleCount);
                 }
-
                 AddApples(cell);
-                cell.ateApple = false;
             }
-            else if (cell.ateMouse) {
-                cell.ateMouse = false;
-                if(!cell.isBad) {
+            else if (((SnakeCells)cell).meal instanceof  MouseCell) {
+
+                if(!((SnakeCells)cell).isBad) {
                     game.addScore(10);
                 }
             }
-            else if (cell.ateSnake) {
-                cell.ateSnake = false;
-                if(!cell.isBad) {
-                    game.addScore(10 + 2*playerSize);
+            else if (((SnakeCells)cell).meal instanceof DeadCell) {
+
+                if(!((SnakeCells)cell).isBad) {
+                    game.addScore(10 + 2* ((DeadCell)((SnakeCells)cell).meal).getSize());
                 }
             }
     }
@@ -121,8 +134,8 @@ public class Level{
     //Requests Cell Class to generate an apple on a free position
     private void AddApples(MovingCells cell) {
 
-        if(appleCount >= startApples || cell.isBad ){
-            Cell apple = Cell.getApple() ;
+        if(appleCount >= startApples || ((SnakeCells)cell).isBad ){
+            Cell apple = Cell.getApple(mapHolder) ;
             updater.cellCreated(apple.getPosition().getLine(), apple.getPosition().getCol(), apple);
             mapHolder.setCellAt(apple, apple.getPosition());
         }
@@ -144,10 +157,10 @@ public class Level{
     public void putCell(int l, int c, Cell cell) {
 
 
-        if(cell instanceof SnakeCells && !((MovingCells)cell).isBad){
-            playerHead = (MovingCells) cell;
+        if(cell instanceof SnakeCells && !((SnakeCells)cell).isBad ){
+            playerHead = (SnakeCells) cell;
         }
-        else if(cell instanceof SnakeCells && ((MovingCells)cell).isBad){
+        else if(cell instanceof SnakeCells && ((SnakeCells)cell).isBad ){
 
             otherPlayers.add((MovingCells) cell);
         }

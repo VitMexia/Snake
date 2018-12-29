@@ -35,10 +35,10 @@ public abstract class CellTile extends Tile{
         if(cell == null){
             return new EmptyTile();
         }
-        else if(cell instanceof SnakeCells && !cell.isBad){
+        else if(cell instanceof SnakeCells && !((SnakeCells)cell).isBad){
             return new HeadTile();
         }
-        else if(cell instanceof DeadCell && !cell.isBad){
+        else if(cell instanceof DeadCell && !((DeadCell)cell).isBad){
             return new DeadTile();
         }
         else if(cell instanceof BodyCell){
@@ -53,10 +53,10 @@ public abstract class CellTile extends Tile{
         else if(cell instanceof MouseCell){
             return new MouseTile();
         }
-        else if(cell instanceof SnakeCells && cell.isBad){
+        else if(cell instanceof SnakeCells && ((SnakeCells)cell).isBad){
             return new BadSnakeTile();
         }
-        else if(cell instanceof DeadCell && cell.isBad){
+        else if(cell instanceof DeadCell && ((DeadCell)cell).isBad){
             return new BadDeadTile();
         }
         return null;
